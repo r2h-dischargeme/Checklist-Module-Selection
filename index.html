@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Discharge Checklist Guide</title>
+<style>
+  :root{
+    --bg:#f6f8f7; --ink:#1d2b28; --muted:#5b6b67; --line:#cfd9d6;
+    --accent:#0f6b5c; --accent-ink:#fff; --card:#fff; --err:#b3261e;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#121917; --ink:#e8f0ee; --muted:#9fb0ab; --line:#33433f; --accent:#4fc3ad; --accent-ink:#0b1412; --card:#1a2421; --err:#ff8a80;}
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font:16px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    display:flex; justify-content:center;
+  }
+  main{
+    width:100%; max-width:480px; height:100dvh;
+    padding:max(12px,env(safe-area-inset-top)) 16px max(12px,env(safe-area-inset-bottom));
+    display:flex; flex-direction:column; gap:8px;
+  }
+  h1{font-size:20px;margin:0}
+  p.sub{margin:0;color:var(--muted);font-size:14px}
+  fieldset{border:0;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:6px}
+  legend{font-weight:600;font-size:14px;margin-bottom:4px;padding:0}
+  .mod{
+    display:flex;align-items:center;gap:10px;
+    min-height:44px;padding:8px 12px;
+    background:var(--card);border:2px solid var(--line);border-radius:10px;
+    cursor:pointer;font-size:15px;
+  }
+  .mod input{width:22px;height:22px;accent-color:var(--accent);flex:none;margin:0}
+  .mod:has(input:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--card))}
+  .mod:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px}
+  .mod b{min-width:1.2em}
+  .mod{min-height:40px;padding:6px 12px;font-size:14.5px}
+  .mod.all{font-weight:600}
+  .mod:has(input:disabled){opacity:.45;cursor:default}
+  fieldset{gap:5px}
+  textarea{height:52px}
+  @media (max-height:700px){
+    h1{font-size:18px} p.sub{font-size:13px}
+    .mod{min-height:36px;padding:4px 10px}
+    textarea{height:44px}
+    small{display:none}
+  }
+  label.field{font-weight:600;font-size:14px;display:block;margin-bottom:3px}
+  input[type=email],textarea{
+    width:100%;font:inherit;color:var(--ink);background:var(--card);
+    border:2px solid var(--line);border-radius:10px;padding:9px 12px;
+  }
+  input[type=email]{min-height:44px}
+  textarea{resize:none;height:64px}
+  input:focus,textarea:focus{outline:3px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  button{
+    min-height:50px;border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);
+    font:inherit;font-weight:700;font-size:17px;cursor:pointer;
+  }
+  button:disabled{opacity:.6;cursor:default}
+  #status{min-height:18px;font-size:14px;margin:0;text-align:center}
+  #status.err{color:var(--err)}
+  #status.ok{color:var(--accent);font-weight:600}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  .spacer{flex:1}
+  small{color:var(--muted);font-size:12px;text-align:center;display:block}
+</style>
+</head>
+<body>
+<main>
+  <h1>Discharge Checklist Guide</h1>
+  <p class="sub"><b>Request another module.</b> Select the module(s) you would like to receive, and we will email it to you.</p>
+
+  <form id="f" novalidate style="display:flex;flex-direction:column;gap:8px;flex:1;min-height:0">
+    <fieldset>
+      <legend>Modules</legend>
+      <label class="mod all"><input type="checkbox" id="all" name="module" value="Complete guide: all modules A to F"><b>★</b> Complete guide (all modules)</label>
+      <label class="mod"><input type="checkbox" name="module" value="A: Medical and Health"><b>A</b> Medical and Health</label>
+      <label class="mod"><input type="checkbox" name="module" value="B: Modification and Equipment"><b>B</b> Modification and Equipment</label>
+      <label class="mod"><input type="checkbox" name="module" value="C: Personal Care and Support"><b>C</b> Personal Care and Support</label>
+      <label class="mod"><input type="checkbox" name="module" value="D: Mobility and Transport"><b>D</b> Mobility and Transport</label>
+      <label class="mod"><input type="checkbox" name="module" value="E: Ongoing Therapy"><b>E</b> Ongoing Therapy</label>
+      <label class="mod"><input type="checkbox" name="module" value="F: Life Beyond Rehab: Health and Wellness"><b>F</b> Life Beyond Rehab</label>
+    </fieldset>
+
+    <div>
+      <label class="field" for="email">Your email (so we can reply)</label>
+      <input id="email" name="email" type="email" inputmode="email" autocomplete="email" required>
+    </div>
+
+    <div>
+      <label class="field" for="msg">Other questions (optional)</label>
+      <textarea id="msg" name="message" maxlength="1500"></textarea>
+    </div>
+
+    <div class="hp" aria-hidden="true">
+      <label>Leave blank <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+    </div>
+
+    <button id="send" type="submit">Send request</button>
+    <p id="status" role="status" aria-live="polite"></p>
+    <small>Please don't include medical details in your message.</small>
+  </form>
+</main>
+
+<script>
+  const f = document.getElementById('f');
+  const btn = document.getElementById('send');
+  const statusEl = document.getElementById('status');
+
+  function setStatus(text, cls){ statusEl.textContent = text; statusEl.className = cls || ''; }
+
+  // Ticking "Complete guide" covers every module, so grey out the individual ones.
+  const allBox = document.getElementById('all');
+  const singles = [...f.querySelectorAll('input[name=module]')].filter(i => i !== allBox);
+  allBox.addEventListener('change', () => {
+    singles.forEach(i => { i.checked = false; i.disabled = allBox.checked; });
+  });
+  f.addEventListener('reset', () => setTimeout(() => singles.forEach(i => i.disabled = false), 0));
+
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const modules = [...f.querySelectorAll('input[name=module]:checked')].map(i => i.value);
+    const email = f.email.value.trim();
+    const message = f.message.value.trim();
+
+    if (!modules.length && !message) return setStatus('Pick a module or write a question.', 'err');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setStatus('Please enter a valid email so we can reply.', 'err');
+
+    btn.disabled = true; btn.textContent = 'Sending…'; setStatus('');
+    try {
+      const res = await fetch('/api/send', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ modules, email, message, website: f.website.value })
+      });
+      if (!res.ok) throw new Error((await res.json().catch(()=>({}))).error || 'Send failed');
+      f.reset();
+      btn.textContent = 'Sent ✓';
+      setStatus('Thanks. We\'ll be in touch soon.', 'ok');
+      setTimeout(() => { btn.disabled = false; btn.textContent = 'Send request'; }, 4000);
+    } catch (err) {
+      btn.disabled = false; btn.textContent = 'Send request';
+      setStatus('Couldn\'t send. Try again, or email r2h.discharge.me@gmail.com.', 'err');
+    }
+  });
+</script>
+</body>
+</html>
